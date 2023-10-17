@@ -39,8 +39,24 @@ func GetUser(userID string) types.User {
 
 	err = db.QueryRow("SELECT * FROM users  WHERE id=$1", userID).Scan(&u.ID, &u.Name, &u.Age, &u.Salary, &u.Occupation)
 	if err != nil {
-		//return *new(types.User)
-		//log.Fatal(err)
+		log.Println(err)
+	}
+
+	return u
+}
+
+func GetList(userID string) types.User {
+	// TODO: must check if the id exists in the first place in the db <17-10-23, modernpacifist> //
+	var u types.User
+
+	db, err := sql.Open("postgres", "postgres://golanguser:golangpassword@localhost/golangdb?sslmode=disable")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	err = db.QueryRow("SELECT * FROM users  WHERE id=$1", userID).Scan(&u.ID, &u.Name, &u.Age, &u.Salary, &u.Occupation)
+	if err != nil {
 		log.Println(err)
 	}
 
