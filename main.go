@@ -86,7 +86,7 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var res []byte
+	var res []types.Data
 
 	marshalers := []types.Marshaler{
 		&types.JSONMarshaler{},
@@ -95,26 +95,26 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	allUsers := db.GetAllRecords()
-	//fmt.Println(allUsers)
 
 	for _, user := range allUsers {
-		var r []byte
-		for _, m := range marshalers {
-			data, err := m.Marshal(user)
-			fmt.Printf("%T", data)
-			if err != nil {
-				fmt.Println("Error:", err)
-				continue
-			}
-			r = append(r, data)
+		data := []byte{}
+		temp := [3][]byte{}
+		for i, m := range marshalers {
+			data, _ = m.Marshal(user)
+			temp[i] = data
 		}
-		res = append(res, r)
+		d := types.Data {
+			JsonField: string(temp[0]),
+			XmlField: string(temp[1]),
+			TomlField: string(temp[2]),
+		}
+		res = append(res, d)
 	}
 
-	//fmt.Println(res)
+	e, _ := json.Marshal(res)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(res)
+	w.Write(e)
 }
 
 func handleRequests() {
