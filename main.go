@@ -35,10 +35,13 @@ func addUserHandler(w http.ResponseWriter, req *http.Request) {
 	//buffer := bytes.NewBuffer(jsonData)
 
 	//url := "http://localhost:8080/adduser"
+	addedUserId := db.AddUser()
+	fmt.Println(addedUserId)
 }
 
 func getUserHandler(w http.ResponseWriter, req *http.Request) {
-
+	user := db.GetUser(1)
+	fmt.Println(user)
 }
 
 func helloHandler(w http.ResponseWriter, req *http.Request) {
@@ -54,8 +57,6 @@ func handleRequests() {
 }
 
 func main() {
-	id := db.DbAddUser()
-	fmt.Println(id)
 
 	http.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
