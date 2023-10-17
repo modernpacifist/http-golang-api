@@ -15,34 +15,27 @@ import (
 
 func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed")
+		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
 		return
 	}
 
 	var user types.User
-	err := json.NewDecoder(r.Boby).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
 		return
 	}
 
+	addedUserId := db.AddUser(user)
+
 	response := struct {
 		Message string `json:"message"`
 	}{
-		Message: "Received new user successfully"
+		Message: fmt.Sprintf("%d", addedUserId),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
-
-	//jsonData, _ := json.Marshal(user)
-	//fmt.Println(jsonData)
-
-	//buffer := bytes.NewBuffer(jsonData)
-
-	//url := "http://localhost:8080/adduser"
-	addedUserId := db.AddUser(user)
-	fmt.Println(addedUserId)
 }
 
 func getUserHandler(w http.ResponseWriter, r *http.Request) {
