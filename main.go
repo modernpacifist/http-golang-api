@@ -54,6 +54,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 		&types.TOMLMarshaler{},
 	}
 
+	// TODO: there must be no hardcoded sizes/indexing <17-10-23, modernpacifist> //
 	info := [3][]byte{}
 	for i, m := range marshalers {
 		info[i], _ = m.Marshal(retrievedUser)
