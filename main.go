@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"log"
 
 	"http-golang-api/db"
 
@@ -15,7 +16,21 @@ type User struct {
 	Name int `json:"name"`
 	Age int `json:"age"`
 	Salary int `json:"salary"`
-	Occupation int `json:"salary"`
+	Occupation int `json:"occupation"`
+}
+
+func addUserHandler(w http.ResponseWriter, req *http.Request) {
+	user := User{
+		ID: "1", 
+		Name: "john"
+		Age: "age"
+		Salary: "salary"
+		Occupation: "occupation"
+	}
+}
+
+func getUserHandler(w http.ResponseWriter, req *http.Request) {
+
 }
 
 func helloHandler(w http.ResponseWriter, req *http.Request) {
@@ -30,6 +45,8 @@ func main() {
 	))
 
 	http.HandleFunc("/hello", helloHandler)
+	http.HandleFunc("/adduser/", addUserHandler)
+	http.HandleFunc("/getuser/{id}", getUserHandler)
 
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
