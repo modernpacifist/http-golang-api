@@ -9,7 +9,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-//func AddUser() int {
 func AddUser(user types.User) int {
 	var id int
 
