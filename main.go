@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	//"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +9,6 @@ import (
 	"http-golang-api/db"
 	"http-golang-api/types"
 
-	//"github.com/pelletier/go-toml"
 	"github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
@@ -46,6 +44,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: this is bullshit line <17-10-23, modernpacifist> //
 	id := r.URL.Path[len("/api/getuser/"):]
 	retrievedUser := db.GetUser(id)
 
