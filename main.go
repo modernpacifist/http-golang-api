@@ -86,7 +86,7 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var res []bytes
+	var res []byte
 
 	marshalers := []types.Marshaler{
 		&types.JSONMarshaler{},
@@ -98,14 +98,17 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(allUsers)
 
 	for _, user := range allUsers {
+		var r []byte
 		for _, m := range marshalers {
 			data, err := m.Marshal(user)
+			fmt.Printf("%T", data)
 			if err != nil {
 				fmt.Println("Error:", err)
 				continue
 			}
-			res = append(res, data)
+			r = append(r, data)
 		}
+		res = append(res, r)
 	}
 
 	//fmt.Println(res)
