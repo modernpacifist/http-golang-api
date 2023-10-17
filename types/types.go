@@ -7,6 +7,7 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
+// TODO: the string type must actually be a list of bytes <17-10-23, modernpacifist> //
 type Data struct {
 	JsonField string `json:"json"`
 	XmlField  string `xml: "xml"`

@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"encoding/xml"
+	//"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"http-golang-api/db"
 	"http-golang-api/types"
 
-	"github.com/pelletier/go-toml"
+	//"github.com/pelletier/go-toml"
 	"github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
@@ -49,26 +49,21 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/api/getuser/"):]
 	retrievedUser := db.GetUser(id)
 
-	// TODO: this must be wrapped in design pattern <17-10-23, modernpacifist> //
-	jsonData, err := json.Marshal(retrievedUser)
-	if err != nil {
-		log.Println(err)
+	marshalers := []types.Marshaler{
+		&types.JSONMarshaler{},
+		&types.XMLMarshaler{},
+		&types.TOMLMarshaler{},
 	}
 
-	xmlData, err := xml.Marshal(retrievedUser)
-	if err != nil {
-		log.Println(err)
-	}
-
-	tomlData, err := toml.Marshal(retrievedUser)
-	if err != nil {
-		log.Println(err)
+	info := [3][]byte{}
+	for i, m := range marshalers {
+		info[i], _ = m.Marshal(retrievedUser)
 	}
 
 	d := types.Data{
-		JsonField: string(jsonData),
-		XmlField:  string(xmlData),
-		TomlField: string(tomlData),
+		JsonField: string(info[0]),
+		XmlField:  string(info[1]),
+		TomlField: string(info[2]),
 	}
 	json_data, err := json.Marshal(d)
 	if err != nil {
