@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"./db"
 )
 
 func helloHandler(w http.ResponseWriter, req *http.Request) {
@@ -12,4 +14,7 @@ func helloHandler(w http.ResponseWriter, req *http.Request) {
 func main() {
 	http.HandleFunc("/hello", helloHandler)
 	http.ListenAndServe(":8080", nil)
+
+
+	db.connectToDb()
 }
