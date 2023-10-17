@@ -7,21 +7,14 @@ import (
 	"encoding/json"
 
 	"http-golang-api/db"
+	"http-golang-api/types"
 
 	"github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
 
-type User struct {
-	ID int `json:"id"`
-	Name string `json:"name"`
-	Age int `json:"age"`
-	Salary int `json:"salary"`
-	Occupation string `json:"occupation"`
-}
-
-func addUserHandler(w http.ResponseWriter, req *http.Request) {
-	user := User{
+func addUserHandler(w http.ResponseWriter, r *http.Request) {
+	user := types.User{
 		ID: 1, 
 		Name: "john",
 		Age: 21,
@@ -39,28 +32,31 @@ func addUserHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Println(addedUserId)
 }
 
-func getUserHandler(w http.ResponseWriter, req *http.Request) {
-	user := db.GetUser(1)
-	fmt.Println(user)
-}
+func getUserHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Path[len("/getuser/"):]
+	retrievedUser := db.GetUser(id)
 
-func helloHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "hello\n")
+	jsonData, err := json.Marshal(retrievedUser)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 func handleRequests() {
-	http.HandleFunc("/", helloHandler)
+	//http.HandleFunc("/", helloHandler)
 	http.HandleFunc("/adduser/", addUserHandler)
-	http.HandleFunc("/getuser/{id}", getUserHandler)
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
-func main() {
+	http.HandleFunc("/getuser/", getUserHandler)
 
 	http.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
 	))
 
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func main() {
 	handleRequests()
 }
