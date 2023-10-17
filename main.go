@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"log"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
+	"log"
+	"net/http"
 
 	"http-golang-api/db"
 	"http-golang-api/types"
@@ -51,39 +51,67 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: this must be wrapped in design pattern <17-10-23, modernpacifist> //
 	jsonData, err := json.Marshal(retrievedUser)
-	fmt.Println(jsonData)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	xmlData, err := xml.Marshal(retrievedUser)
-	fmt.Println(string(xmlData))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	tomlData, err := toml.Marshal(retrievedUser)
-	fmt.Println(string(tomlData))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	}
+
+	d := types.Data{
+		JsonField: string(jsonData),
+		XmlField:  string(xmlData),
+		TomlField: string(tomlData),
+	}
+	json_data, err := json.Marshal(d)
+	if err != nil {
+		log.Println(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
+	w.Write(json_data)
 }
 
 // TODO: temp name <17-10-23, modernpacifist> //
 func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
-	//id := r.URL.Path[len("/getuser/"):]
-	//retrievedUser := db.GetUser(id)
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
+		return
+	}
 
-	//jsonData, err := json.Marshal(retrievedUser)
-	//if err != nil {
-		//log.Fatal(err)
-	//}
+	var res []bytes
 
-	//w.Header().Set("Content-Type", "application/json")
-	//w.Write(jsonData)
+	marshalers := []types.Marshaler{
+		&types.JSONMarshaler{},
+		&types.XMLMarshaler{},
+		&types.TOMLMarshaler{},
+	}
+
+	allUsers := db.GetAllRecords()
+	//fmt.Println(allUsers)
+
+	for _, user := range allUsers {
+		for _, m := range marshalers {
+			data, err := m.Marshal(user)
+			if err != nil {
+				fmt.Println("Error:", err)
+				continue
+			}
+			res = append(res, data)
+		}
+	}
+
+	//fmt.Println(res)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(res)
 }
 
 func handleRequests() {

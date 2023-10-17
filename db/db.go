@@ -1,8 +1,8 @@
 package db
 
 import (
-	"log"
 	"database/sql"
+	"log"
 
 	"http-golang-api/types"
 
@@ -45,9 +45,9 @@ func GetUser(userID string) types.User {
 	return u
 }
 
-func GetList(userID string) types.User {
+func GetAllRecords() []types.User {
 	// TODO: must check if the id exists in the first place in the db <17-10-23, modernpacifist> //
-	var u types.User
+	var res []types.User
 
 	db, err := sql.Open("postgres", "postgres://golanguser:golangpassword@localhost/golangdb?sslmode=disable")
 	if err != nil {
@@ -55,10 +55,20 @@ func GetList(userID string) types.User {
 	}
 	defer db.Close()
 
-	err = db.QueryRow("SELECT * FROM users  WHERE id=$1", userID).Scan(&u.ID, &u.Name, &u.Age, &u.Salary, &u.Occupation)
+	rows, err := db.Query("SELECT * FROM users")
 	if err != nil {
 		log.Println(err)
 	}
+	defer rows.Close()
 
-	return u
+	for rows.Next() {
+		var u types.User
+		err := rows.Scan(&u.ID, &u.Name, &u.Age, &u.Salary, &u.Occupation)
+		if err != nil {
+			log.Println(err)
+		}
+		res = append(res, u)
+	}
+
+	return res
 }
