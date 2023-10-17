@@ -9,7 +9,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func AddUser() int {
+//func AddUser() int {
+func AddUser(user types.User) int {
 	var id int
 
 	// TODO: this url must be in .env file <17-10-23, modernpacifist> //
@@ -19,7 +20,7 @@ func AddUser() int {
 	}
 	defer db.Close()
 
-	err = db.QueryRow("INSERT INTO users (name, age, salary, occupation) VALUES ($1, $2, $3, $4) RETURNING id", "user1", "21", "10001", "programmer").Scan(&id)
+	err = db.QueryRow("INSERT INTO users (name, age, salary, occupation) VALUES ($1, $2, $3, $4) RETURNING id", user.Name, user.Age, user.Salary, user.Occupation).Scan(&id)
 	if err != nil {
 		log.Println(err)
 	}

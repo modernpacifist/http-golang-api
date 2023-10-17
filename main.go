@@ -26,27 +26,22 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Received user", user)
-
 	response := struct {
-
+		Message string `json:"message"`
+	}{
+		Message: "Received new user successfully"
 	}
 
-	//user := types.User{
-		//ID: 1, 
-		//Name: "john",
-		//Age: 21,
-		//Salary: 100,
-		//Occupation: "occupation1",
-	//}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 
-	jsonData, _ := json.Marshal(user)
-	fmt.Println(jsonData)
+	//jsonData, _ := json.Marshal(user)
+	//fmt.Println(jsonData)
 
 	//buffer := bytes.NewBuffer(jsonData)
 
 	//url := "http://localhost:8080/adduser"
-	addedUserId := db.AddUser()
+	addedUserId := db.AddUser(user)
 	fmt.Println(addedUserId)
 }
 
