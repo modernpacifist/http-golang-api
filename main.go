@@ -1,20 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	//"fmt"
+	//"net/http"
 
-	"./db"
+	"http-golang-api/db"
 )
 
-func helloHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "hello\n")
-}
+//func helloHandler(w http.ResponseWriter, req *http.Request) {
+	//fmt.Fprintf(w, "hello\n")
+//}
 
 func main() {
-	http.HandleFunc("/hello", helloHandler)
-	http.ListenAndServe(":8080", nil)
+	db.DbConnect()
 
-
-	db.connectToDb()
+	//fmt.Println("h")
+	//db.connectToDb()
 }
