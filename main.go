@@ -9,17 +9,29 @@ import (
 	"os"
 
 	"http-golang-api/db"
+	_ "http-golang-api/docs"
 	"http-golang-api/types"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/swaggo/http-swagger"
-	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // TODO: ask about this... <18-10-23, modernpacifist> //
 var dbManager db.DatabaseManager
 
+// @Summary		Add new user
+// @Description	Add new user with info
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Param			name		string	"User name"
+// @Param			age		int	"User name"
+// @Param			occupation		string	"User occupation"
+// @Param			salary		int	"User occupation"
+// @Success		200		{object}	string
+// @Failure		400		{object}	nil
+// @Router			/api/adduser/{id} [post]
 func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
@@ -47,6 +59,15 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// @Summary		Get user by ID
+// @Description	Get user details by ID
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Param			id	path		int	true	"User ID"
+// @Success		200	{object}	nil
+// @Failure		400	{object}	nil
+// @Router			/api/getuser/{id} [get]
 func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
@@ -93,7 +114,6 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(json_data)
 }
 
-// TODO: temp name <17-10-23, modernpacifist> //
 func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
@@ -139,9 +159,8 @@ func handleRequests(port string) {
 	router.HandleFunc("/api/getuser/{id}", getUserHandler)
 	router.HandleFunc("/api/getallusers/", getSerializedListHandler)
 
-	http.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", port)),
-	))
+	//router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
 }
@@ -159,7 +178,7 @@ func main() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	host := flag.String("host", dbHost, "New index")
+	dbhost := flag.String("host", dbHost, "New index")
 	port := flag.String("port", servicePort, "New index")
 	dbport := flag.String("dbport", dbPort, "New index")
 	user := flag.String("user", dbUser, "New index")
@@ -171,7 +190,7 @@ func main() {
 	log.Println("Service started")
 
 	dbManager = db.DatabaseManager{
-		Host:     *host,
+		Host:     *dbhost,
 		Port:     *dbport,
 		User:     *user,
 		Password: *password,
