@@ -10,7 +10,7 @@ import (
 )
 
 func dbConnect() (*sql.DB, error) {
-	db, err := sql.Open("postgres",  "postgres://golanguser:golangpassword@localhost/golangdb?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://golanguser:golangpassword@localhost/golangdb?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +24,6 @@ func dbConnect() (*sql.DB, error) {
 }
 
 func AddUser(user types.User) int {
-	log.Println("db.AddUser: Method called")
-
 	var id int
 
 	// TODO: this url must be in .env file <17-10-23, modernpacifist> //
@@ -46,8 +44,6 @@ func AddUser(user types.User) int {
 
 func GetUser(userID string) types.User {
 	// TODO: must check if the id exists in the first place in the db <17-10-23, modernpacifist> //
-	log.Println("db.GetUser: Method called")
-
 	var u types.User
 
 	db, err := dbConnect()
@@ -65,8 +61,6 @@ func GetUser(userID string) types.User {
 }
 
 func GetAllRecords() []types.User {
-	log.Println("db.GetAllRecords: Method called")
-
 	var res []types.User
 
 	db, err := dbConnect()

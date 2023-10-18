@@ -9,6 +9,7 @@ import (
 	"http-golang-api/db"
 	"http-golang-api/types"
 
+	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
@@ -16,6 +17,7 @@ import (
 func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
+		log.Println("main.addUserHandler:Method not allowed, http.StatusMethodNotAllowed Code 405")
 		return
 	}
 
@@ -23,6 +25,7 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		log.Println("main.addUserHandler: Received invalid JSON payload")
 		return
 	}
 
@@ -41,11 +44,21 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
+		log.Println("main.getUserHandler:Method not allowed, http.StatusMethodNotAllowed Code 405")
 		return
 	}
 
-	// TODO: this is bullshit line <17-10-23, modernpacifist> //
-	id := r.URL.Path[len("/api/getuser/"):]
+	vars := mux.Vars(r)
+
+	var id string
+
+	if value, ok := vars["id"]; !ok {
+		log.Println("main.getUserHandler: did not receive id in url")
+		return
+	} else {
+		id = value
+	}
+
 	retrievedUser := db.GetUser(id)
 
 	marshalers := []types.Marshaler{
@@ -114,15 +127,17 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
-	http.HandleFunc("/api/adduser/", addUserHandler)
-	http.HandleFunc("/api/getuser/", getUserHandler)
-	http.HandleFunc("/api/getallusers/", getSerializedListHandler)
+	router := mux.NewRouter()
+
+	router.HandleFunc("/api/adduser/", addUserHandler)
+	router.HandleFunc("/api/getuser/{id}", getUserHandler)
+	router.HandleFunc("/api/getallusers/", getSerializedListHandler)
 
 	http.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
 	))
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func main() {
