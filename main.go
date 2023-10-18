@@ -132,7 +132,7 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(e)
 }
 
-func handleRequests() {
+func handleRequests(port string) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/adduser/", addUserHandler)
@@ -140,10 +140,10 @@ func handleRequests() {
 	router.HandleFunc("/api/getallusers/", getSerializedListHandler)
 
 	http.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", port)),
 	))
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
 }
 
 func main() {
@@ -152,7 +152,7 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	port := os.Getenv("SERVICE_PORT")
+	servicePort := os.Getenv("SERVICE_PORT")
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
@@ -160,7 +160,7 @@ func main() {
 	dbName := os.Getenv("DB_NAME")
 
 	host := flag.String("host", dbHost, "New index")
-	port := flag.String("port", port, "New index")
+	port := flag.String("port", servicePort, "New index")
 	dbport := flag.String("dbport", dbPort, "New index")
 	user := flag.String("user", dbUser, "New index")
 	password := flag.String("password", dbPassword, "New index")
@@ -172,11 +172,11 @@ func main() {
 
 	dbManager = db.DatabaseManager{
 		Host:     *host,
-		Port:     *port,
+		Port:     *dbport,
 		User:     *user,
 		Password: *password,
 		DBName:   *dbname,
 	}
 
-	handleRequests()
+	handleRequests(*port)
 }
