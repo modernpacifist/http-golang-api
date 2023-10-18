@@ -164,7 +164,6 @@ func handleRequests(port string) {
 	router.HandleFunc("/api/getuser/{id}", getUserHandler)
 	router.HandleFunc("/api/getallusers/", getSerializedListHandler)
 
-	//router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
@@ -183,7 +182,7 @@ func main() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	dbhost := flag.String("host", dbHost, "New index")
+	dbhost := flag.String("dbhost", dbHost, "New index")
 	port := flag.String("port", servicePort, "New index")
 	dbport := flag.String("dbport", dbPort, "New index")
 	user := flag.String("user", dbUser, "New index")
