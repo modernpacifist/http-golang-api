@@ -45,5 +45,5 @@ type User struct {
 }
 
 type EmptyJson struct {
-	Field string `json:"id"`
+	Field string `json:"message"`
 }
