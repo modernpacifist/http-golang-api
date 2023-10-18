@@ -125,5 +125,7 @@ func handleRequests() {
 }
 
 func main() {
+	log.Println("Service started")
+
 	handleRequests()
 }
