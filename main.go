@@ -116,7 +116,7 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 func handleRequests() {
 	http.HandleFunc("/api/adduser/", addUserHandler)
 	http.HandleFunc("/api/getuser/", getUserHandler)
-	http.HandleFunc("/api/getlist/", getSerializedListHandler)
+	http.HandleFunc("/api/getallusers/", getSerializedListHandler)
 
 	http.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
