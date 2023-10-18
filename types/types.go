@@ -15,9 +15,9 @@ type Data struct {
 }
 
 //type Data struct {
-	//JsonField []byte `json:"json"`
-	//XmlField  []byte `xml: "xml"`
-	//TomlField []byte `toml: "toml"`
+//JsonField []byte `json:"json"`
+//XmlField  []byte `xml: "xml"`
+//TomlField []byte `toml: "toml"`
 //}
 
 type Marshaler interface {

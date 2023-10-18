@@ -78,6 +78,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
+		log.Println("main.getSerializedListHandler:Method not allowed, http.StatusMethodNotAllowed Code 405")
 		return
 	}
 
@@ -98,9 +99,9 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 			data, _ = m.Marshal(user)
 			temp[i] = data
 		}
-		d := types.Data {
+		d := types.Data{
 			JsonField: string(temp[0]),
-			XmlField: string(temp[1]),
+			XmlField:  string(temp[1]),
 			TomlField: string(temp[2]),
 		}
 		res = append(res, d)
