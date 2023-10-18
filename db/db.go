@@ -2,37 +2,26 @@ package db
 
 import (
 	"database/sql"
-	"log"
 	"fmt"
+	"log"
 
 	"http-golang-api/types"
 
 	_ "github.com/lib/pq"
 )
 
-//// Define an interface for database operations
-//type DBOperations interface {
-//Connect() (*sql.DB, error)
-//AddUser(user User) error
-//GetUser
-//}
-
 type DatabaseManager struct {
 	Host     string
-	Port     int
+	Port     string
 	User     string
 	Password string
 	DBName   string
 }
 
-// func Connect() (*sql.DB, error) {
-func (db DatabaseManager) Connect() (*sql.DB, error) {
-	//connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", db.Host, db.Port, db.User, db.Password, db.DBName)
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", db.User, db.Password, db.Host, db.DBName)
+func (db *DatabaseManager) Connect() (*sql.DB, error) {
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", db.Host, db.Port, db.User, db.Password, db.DBName)
 
-	//db, err := sql.Open("postgres", "postgres://golanguser:golangpassword@localhost/golangdb?sslmode=disable")
 	conn, err := sql.Open("postgres", connStr)
-
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +34,7 @@ func (db DatabaseManager) Connect() (*sql.DB, error) {
 	return conn, nil
 }
 
-func (db DatabaseManager) AddUser(user types.User) int {
-//func AddUser(user types.User) int {
+func (db *DatabaseManager) AddUser(user types.User) int {
 	var id int
 
 	// TODO: this url must be in .env file <17-10-23, modernpacifist> //
@@ -65,7 +53,7 @@ func (db DatabaseManager) AddUser(user types.User) int {
 	return id
 }
 
-func (db DatabaseManager) GetUser(userID string) types.User {
+func (db *DatabaseManager) GetUser(userID string) types.User {
 	// TODO: must check if the id exists in the first place in the db <17-10-23, modernpacifist> //
 	var u types.User
 
@@ -83,7 +71,7 @@ func (db DatabaseManager) GetUser(userID string) types.User {
 	return u
 }
 
-func (db DatabaseManager) GetAllRecords() []types.User {
+func (db *DatabaseManager) GetAllRecords() []types.User {
 	var res []types.User
 
 	conn, err := db.Connect()

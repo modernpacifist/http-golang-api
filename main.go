@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,9 +11,13 @@ import (
 	"http-golang-api/types"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/http-swagger/example/go-chi/docs"
 )
+
+// TODO: ask about this... <18-10-23, modernpacifist> //
+var dbManager db.DatabaseManager
 
 func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -29,7 +34,7 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addedUserId := db.AddUser(user)
+	addedUserId := dbManager.AddUser(user)
 
 	response := struct {
 		Message string `json:"id"`
@@ -59,7 +64,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 		id = value
 	}
 
-	retrievedUser := db.GetUser(id)
+	retrievedUser := dbManager.GetUser(id)
 
 	marshalers := []types.Marshaler{
 		&types.JSONMarshaler{},
@@ -103,7 +108,7 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 		&types.TOMLMarshaler{},
 	}
 
-	allUsers := db.GetAllRecords()
+	allUsers := dbManager.GetAllRecords()
 
 	for _, user := range allUsers {
 		data := []byte{}
@@ -141,15 +146,45 @@ func handleRequests() {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+
+	host := flag.String("host", dbHost, "New index")
+	port := flag.String("port", dbPort, "New index")
+	user := flag.String("user", dbUser, "New index")
+	password := flag.String("password", dbPassword, "New index")
+	dbname := flag.String("dbname", dbName, "New index")
+
+	flag.Parse()
+
+	if *layouts == "" {
+		panic("layouts flag was not specified")
+	}
+
 	log.Println("Service started")
 
-	dbManager := &types.DatabaseManager{
-		Host:     "localhost",
-		Port:     "5432",
-		User:     "golanguser",
+	//dbManager = db.DatabaseManager{
+		//Host:     "localhost",
+		//Port:     "5432",
+		//User:     "golanguser",
+		//Password: "golangpassword",
+		//DBName:   "golangdb",
+	//}
+	dbManager = db.DatabaseManager{
+		Host:     *host,
+		Port:     *port,
+		User:*,
 		Password: "golangpassword",
 		DBName:   "golangdb",
 	}
 
-	handleRequests(dbManager)
+	handleRequests()
 }

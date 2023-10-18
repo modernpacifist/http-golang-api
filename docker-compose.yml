@@ -7,7 +7,7 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - ./.env
+      - ./.env_docker
     environment:
       POSTGRES_DB: 
       POSTGRES_USER: 
