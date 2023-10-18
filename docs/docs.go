@@ -30,9 +30,9 @@ const docTemplate = `{
                 "summary": "Add new user",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "occupation",
+                        "type": "string",
+                        "description": "User name",
+                        "name": "name",
                         "in": "path",
                         "required": true
                     }

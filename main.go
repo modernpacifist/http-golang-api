@@ -25,13 +25,10 @@ var dbManager db.DatabaseManager
 // @Tags			Users
 // @Accept			json
 // @Produce		json
-// @Param			name		string	"User name"
-// @Param			age		int	"User name"
-// @Param			occupation		string	"User occupation"
-// @Param			salary		int	"User occupation"
+// @Param	name path	string true	"User name"
 // @Success		200		{object}	string
 // @Failure		400		{object}	nil
-// @Router			/api/adduser/{id} [post]
+// @Router			/api/adduser [post]
 func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)

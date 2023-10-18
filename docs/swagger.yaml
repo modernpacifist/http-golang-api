@@ -7,11 +7,11 @@ paths:
       - application/json
       description: Add new user with info
       parameters:
-      - description: User ID
+      - description: User name
         in: path
-        name: occupation
+        name: name
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
