@@ -49,3 +49,11 @@ type User struct {
 	Salary     int    `json:"salary"`
 	Occupation string `json:"occupation"`
 }
+
+type DatabaseManager struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DBName   string
+}

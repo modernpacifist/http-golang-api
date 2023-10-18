@@ -80,7 +80,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	json_data, err := json.Marshal(d)
 	if err != nil {
-		log.Println(err)
+		log.Printf("main.getUserHandler: problem with serialization of Data struct:%v", err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -143,5 +143,13 @@ func handleRequests() {
 func main() {
 	log.Println("Service started")
 
-	handleRequests()
+	dbManager := &types.DatabaseManager{
+		Host:     "localhost",
+		Port:     "5432",
+		User:     "golanguser",
+		Password: "golangpassword",
+		DBName:   "golangdb",
+	}
+
+	handleRequests(dbManager)
 }
