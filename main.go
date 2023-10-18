@@ -62,6 +62,7 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func marshalize(user types.User) [3][]byte {
 	var wg sync.WaitGroup
+	info := [3][]byte{}
 
 	serializedData := make(chan []byte, 3)
 
@@ -70,13 +71,23 @@ func marshalize(user types.User) [3][]byte {
 		go func() {
 			defer wg.Done()
 
-			//json, _ := types.JSONMarshaler.Marshal(user)
 			jsonData, _ := json.Marshal(user)
 			xmlData, _ := xml.Marshal(user)
-			tml, _ := toml.Marshal(user)
+			tomlData, _ := toml.Marshal(user)
 
-			serializedData <- json
+			serializedData <- jsonData
+			serializedData <- xmlData
+			serializedData <- tomlData
 		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(serializedData)
+	}
+
+	for data := range serializedData {
+		log.Println(data)
 	}
 }
 
