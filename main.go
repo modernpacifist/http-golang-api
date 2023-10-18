@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"http-golang-api/db"
 	"http-golang-api/types"
@@ -151,6 +152,7 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
+	port := os.Getenv("SERVICE_PORT")
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
@@ -158,32 +160,22 @@ func main() {
 	dbName := os.Getenv("DB_NAME")
 
 	host := flag.String("host", dbHost, "New index")
-	port := flag.String("port", dbPort, "New index")
+	port := flag.String("port", port, "New index")
+	dbport := flag.String("dbport", dbPort, "New index")
 	user := flag.String("user", dbUser, "New index")
 	password := flag.String("password", dbPassword, "New index")
 	dbname := flag.String("dbname", dbName, "New index")
 
 	flag.Parse()
 
-	if *layouts == "" {
-		panic("layouts flag was not specified")
-	}
-
 	log.Println("Service started")
 
-	//dbManager = db.DatabaseManager{
-		//Host:     "localhost",
-		//Port:     "5432",
-		//User:     "golanguser",
-		//Password: "golangpassword",
-		//DBName:   "golangdb",
-	//}
 	dbManager = db.DatabaseManager{
 		Host:     *host,
 		Port:     *port,
-		User:*,
-		Password: "golangpassword",
-		DBName:   "golangdb",
+		User:     *user,
+		Password: *password,
+		DBName:   *dbname,
 	}
 
 	handleRequests()
