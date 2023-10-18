@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -53,26 +54,31 @@ func (db *DatabaseManager) AddUser(user types.User) int {
 	return id
 }
 
-func (db *DatabaseManager) GetUser(userID string) types.User {
+// func (db *DatabaseManager) GetUser(userID string) types.User {
+func (db *DatabaseManager) GetUser(userID string) (*types.User, error) {
 	// TODO: must check if the id exists in the first place in the db <17-10-23, modernpacifist> //
-	var u types.User
+	var user types.User
 
 	conn, err := db.Connect()
 	if err != nil {
 		log.Fatalf("db.GetAllRecords: Could not connect to database %v", err)
 	}
 
-	err = conn.QueryRow("SELECT * FROM users  WHERE id=$1", userID).Scan(&u.ID, &u.Name, &u.Age, &u.Salary, &u.Occupation)
+	err = conn.QueryRow("SELECT * FROM users  WHERE id=$1", userID).Scan(&user.ID, &user.Name, &user.Age, &user.Salary, &user.Occupation)
 	if err != nil {
 		log.Printf("db.GetUser.QueryRow: %v", err)
+		//return nil,
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
 	}
 
-	log.Printf("db.GetUser: Successfully retrieved user with id %d\n", u.ID)
-	return u
+	log.Printf("db.GetUser: Successfully retrieved user with id %d\n", user.ID)
+	return &user, nil
 }
 
 func (db *DatabaseManager) GetAllRecords() []types.User {
-	var res []types.User
+	var users []types.User
 
 	conn, err := db.Connect()
 	if err != nil {
@@ -91,10 +97,10 @@ func (db *DatabaseManager) GetAllRecords() []types.User {
 		if err != nil {
 			log.Printf("db.GetAllRecords.rows.Scan: could not get info for user with ID:%d\n", u.ID)
 		}
-		res = append(res, u)
+		users = append(users, u)
 	}
 
-	log.Printf("db.GetAllRecords.sql.Open: Successfully retrieved total %d records", len(res))
+	log.Printf("db.GetAllRecords.sql.Open: Successfully retrieved total %d records", len(users))
 
-	return res
+	return users
 }

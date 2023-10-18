@@ -5,16 +5,15 @@ import (
 	"encoding/xml"
 	"flag"
 	"fmt"
-	"sync"
 	"log"
 	"net/http"
 	"os"
+	"sync"
 
-	"http-golang-api/db"
-	"http-golang-api/types"
 	"github.com/pelletier/go-toml"
+	"http-golang-api/db"
 	_ "http-golang-api/docs"
-
+	"http-golang-api/types"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -119,9 +118,15 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 		id = value
 	}
 
-	retrievedUser := dbManager.GetUser(id)
+	retrievedUser, err := dbManager.GetUser(id)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		nullJson, _ := json.Marshal(types.EmptyJson{Field: fmt.Sprintf("User with id: %s does not exist", id)})
+		w.Write(nullJson)
+		return
+	}
 
-	i := marshalizeParallel(retrievedUser)
+	i := marshalizeParallel(*retrievedUser)
 
 	d := types.Data{
 		JsonField: string(i[0]),
@@ -152,9 +157,15 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var res []types.Data
+	var usersList []types.Data
 
 	allUsers := dbManager.GetAllRecords()
+	if len(allUsers) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		nullJson, _ := json.Marshal(types.EmptyJson{Field: "Users are null"})
+		w.Write(nullJson)
+		return
+	}
 
 	for _, user := range allUsers {
 		i := marshalizeParallel(user)
@@ -163,10 +174,10 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 			XmlField:  string(i[1]),
 			TomlField: string(i[2]),
 		}
-		res = append(res, d)
+		usersList = append(usersList, d)
 	}
 
-	e, _ := json.Marshal(res)
+	e, _ := json.Marshal(usersList)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(e)

@@ -43,3 +43,7 @@ type User struct {
 	Salary     int    `json:"salary"`
 	Occupation string `json:"occupation"`
 }
+
+type EmptyJson struct {
+	Field string `json:"id"`
+}
