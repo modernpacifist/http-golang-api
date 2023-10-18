@@ -60,9 +60,9 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func marshalize(user types.User) [3][]byte {
+func marshalizeParallel(user types.User) []string {
 	var wg sync.WaitGroup
-	info := [3][]byte{}
+	info := []string{}
 
 	serializedData := make(chan []byte, 3)
 
@@ -84,11 +84,12 @@ func marshalize(user types.User) [3][]byte {
 	go func() {
 		wg.Wait()
 		close(serializedData)
-	}
+	}()
 
 	for data := range serializedData {
-		log.Println(data)
+		info = append(info, string(data))
 	}
+	return info
 }
 
 // @Summary		Get user by ID
@@ -120,22 +121,12 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	retrievedUser := dbManager.GetUser(id)
 
-	marshalers := []types.Marshaler{
-		&types.JSONMarshaler{},
-		&types.XMLMarshaler{},
-		&types.TOMLMarshaler{},
-	}
-
-	// TODO: there must be no hardcoded sizes/indexing <17-10-23, modernpacifist> //
-	info := [3][]byte{}
-	for i, m := range marshalers {
-		info[i], _ = m.Marshal(retrievedUser)
-	}
+	i := marshalizeParallel(retrievedUser)
 
 	d := types.Data{
-		JsonField: string(info[0]),
-		XmlField:  string(info[1]),
-		TomlField: string(info[2]),
+		JsonField: string(i[0]),
+		XmlField:  string(i[1]),
+		TomlField: string(i[2]),
 	}
 	json_data, err := json.Marshal(d)
 	if err != nil {
@@ -163,25 +154,14 @@ func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 
 	var res []types.Data
 
-	marshalers := []types.Marshaler{
-		&types.JSONMarshaler{},
-		&types.XMLMarshaler{},
-		&types.TOMLMarshaler{},
-	}
-
 	allUsers := dbManager.GetAllRecords()
 
 	for _, user := range allUsers {
-		data := []byte{}
-		temp := [3][]byte{}
-		for i, m := range marshalers {
-			data, _ = m.Marshal(user)
-			temp[i] = data
-		}
+		i := marshalizeParallel(user)
 		d := types.Data{
-			JsonField: string(temp[0]),
-			XmlField:  string(temp[1]),
-			TomlField: string(temp[2]),
+			JsonField: string(i[0]),
+			XmlField:  string(i[1]),
+			TomlField: string(i[2]),
 		}
 		res = append(res, d)
 	}
