@@ -1,17 +1,18 @@
 info:
   contact: {}
 paths:
-  /api/adduser/{id}:
+  /api/adduser/:
     post:
       consumes:
       - application/json
       description: Add new user with info
       parameters:
       - description: User name
-        in: path
+        in: body
         name: name
         required: true
-        type: string
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -22,6 +23,23 @@ paths:
         "400":
           description: Bad Request
       summary: Add new user
+      tags:
+      - Users
+  /api/getallusers/:
+    get:
+      consumes:
+      - application/json
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+      summary: Get all users
       tags:
       - Users
   /api/getuser/{id}:

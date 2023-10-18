@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/adduser/{id}": {
+        "/api/adduser/": {
             "post": {
                 "description": "Add new user with info",
                 "consumes": [
@@ -30,13 +30,41 @@ const docTemplate = `{
                 "summary": "Add new user",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "User name",
                         "name": "name",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/getallusers/": {
+            "get": {
+                "description": "Get all users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users",
                 "responses": {
                     "200": {
                         "description": "OK",

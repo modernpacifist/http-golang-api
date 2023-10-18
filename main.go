@@ -25,10 +25,10 @@ var dbManager db.DatabaseManager
 // @Tags			Users
 // @Accept			json
 // @Produce		json
-// @Param	name path	string true	"User name"
+// @Param	name body	string true	"User name"
 // @Success		200		{object}	string
 // @Failure		400		{object}	nil
-// @Router			/api/adduser [post]
+// @Router			/api/adduser/ [post]
 func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
@@ -111,6 +111,14 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(json_data)
 }
 
+// @Summary		Get all users
+// @Description	Get all users
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Success		200		{object}	string
+// @Failure		400		{object}	nil
+// @Router			/api/getallusers/ [get]
 func getSerializedListHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed, http.StatusMethodNotAllowed", 405)
