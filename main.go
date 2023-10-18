@@ -2,15 +2,19 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
+	"sync"
 	"log"
 	"net/http"
 	"os"
 
 	"http-golang-api/db"
-	_ "http-golang-api/docs"
 	"http-golang-api/types"
+	"github.com/pelletier/go-toml"
+	_ "http-golang-api/docs"
+
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -54,6 +58,26 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func marshalize(user types.User) [3][]byte {
+	var wg sync.WaitGroup
+
+	serializedData := make(chan []byte, 3)
+
+	for i := 0; i < 3; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			//json, _ := types.JSONMarshaler.Marshal(user)
+			jsonData, _ := json.Marshal(user)
+			xmlData, _ := xml.Marshal(user)
+			tml, _ := toml.Marshal(user)
+
+			serializedData <- json
+		}()
+	}
 }
 
 // @Summary		Get user by ID
@@ -182,8 +206,8 @@ func main() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	dbhost := flag.String("dbhost", dbHost, "New index")
 	port := flag.String("port", servicePort, "New index")
+	dbhost := flag.String("dbhost", dbHost, "New index")
 	dbport := flag.String("dbport", dbPort, "New index")
 	user := flag.String("user", dbUser, "New index")
 	password := flag.String("password", dbPassword, "New index")

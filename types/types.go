@@ -14,12 +14,6 @@ type Data struct {
 	TomlField string `toml: "toml"`
 }
 
-//type Data struct {
-//JsonField []byte `json:"json"`
-//XmlField  []byte `xml: "xml"`
-//TomlField []byte `toml: "toml"`
-//}
-
 type Marshaler interface {
 	Marshal(v interface{}) ([]byte, error)
 }
